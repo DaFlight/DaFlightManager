@@ -23,4 +23,4 @@ Group Nodes:
 - **daflight.user** - fullBright = true, flyMod = true, maxSpeed = 2
 - **daflight.mod** - fullBright = true, flyMod = true, maxSpeed = 7
 - **daflight.admin** - fullBright = true, flyMod = true, maxSpeed = 15
-- **daflight.*** - fullBright = true, flyMod = true, maxSpeed = 50 (un-limited)
+- **daflight.*** - fullBright = true, flyMod = true, maxSpeed = 50
