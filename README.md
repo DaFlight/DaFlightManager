@@ -16,7 +16,8 @@ DaFlightManager gives server owners fine-grain control over DaFlight-flymod user
 Nodes:
 - **daflight.fullbright** - allows use of the in-built fullbright feature
 - **daflight.flymod** - allows use of the fly and sprint mod
-- **daflight.speed.#** - sets a maximum fly/sprint speed for the user. Values of '#' can be [2, 5, 7, 10, 15, 25, 50]
+- **daflight.speed.#** - sets a maximum fly/sprint speed for the user.<br/> 
+      (Values of '#' can be [2, 5, 7, 10, 15, 25, 50])
 
 Group Nodes:
 - **daflight.user** - fullBright = true, flyMod = true, maxSpeed = 2
