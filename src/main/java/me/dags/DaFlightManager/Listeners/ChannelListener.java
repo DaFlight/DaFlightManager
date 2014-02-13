@@ -3,6 +3,7 @@ package me.dags.DaFlightManager.Listeners;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import me.dags.DaFlightManager.DaFlightManager;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -34,13 +35,16 @@ public class ChannelListener implements PluginMessageListener
             // Toggle sprint/flight
             else if (b.length == 2 && b[0] == 2)
             {
-                if (b[1] == 1)
+                if (p.hasPermission("DaFlight.flymod"))
                 {
-                    exempt(p);
-                }
-                else if (b[1] == 0)
-                {
-                    unExempt(p);
+                    if (b[1] == 1)
+                    {
+                        exempt(p);
+                    }
+                    else if (b[1] == 0)
+                    {
+                        unExempt(p);
+                    }
                 }
             }
         }
@@ -87,39 +91,48 @@ public class ChannelListener implements PluginMessageListener
             b[0] = 100;
             b[1] = 50;
 
-            if (p.isOp())
-            {
-                b[1] = (byte) 50;
-                dispatch(p, b);
-                return;
-            }
+            int limit = 0;
 
             for (int i : speeds)
             {
                 if (p.hasPermission("DaFlight.speed." + i))
                 {
-                    b[1] = (byte) i;
-                    dispatch(p, b);
-                    break;
+                    if (i > limit)
+                    {
+                        limit = i;
+                    }
                 }
+            }
+
+            if (limit > 0)
+            {
+                b[1] = (byte) limit;
+                dispatch(p, b);
             }
         }
     }
 
     private void exempt(Player p)
     {
-        if (ncp && p.hasPermission("daflight.flymod") && !p.isOp())
+        if (ncp && !p.isOp())
         {
             NCPExemptionManager.exemptPermanently(p, CheckType.MOVING);
         }
+        DaFlightManager.inst().setDaFlyer(p, false);
     }
 
     private void unExempt(Player p)
     {
-        if (ncp && p.hasPermission("daflight.flymod") && !p.isOp())
+        if (ncp && !p.isOp())
         {
             NCPExemptionManager.unexempt(p, CheckType.MOVING);
         }
+        if (p.getLocation().add(0, -1, 0).getBlock().getType().equals(Material.AIR))
+        {
+            DaFlightManager.inst().setDaFlyer(p, true);
+            return;
+        }
+        DaFlightManager.inst().removeDaFlyer(p);
     }
 
     public void dispatch(Player p, byte[] b)
