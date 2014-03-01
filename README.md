@@ -3,7 +3,6 @@ DaFlightManager
 Server-side management of DaFlight users
 
 ###Download
-http://dl.dags.me/Plugins/DaFlightManager.jar
 
 =======
 
