@@ -18,6 +18,7 @@ public class DaFlightManager extends JavaPlugin
 {
 
     private static DaFlightManager daFlightManager;
+    private ChannelListener channelListener;
     private boolean ncp;
     private Map<String, Boolean> daFlyers;
 
@@ -37,11 +38,27 @@ public class DaFlightManager extends JavaPlugin
         findNCP();
         registerChannels();
         daFlyers = new HashMap<String, Boolean>();
+        refreshPlayers();
     }
 
     public void onDisable()
     {
         daFlyers.clear();
+    }
+
+    public void refreshPlayers()
+    {
+        Bukkit.getScheduler().runTask(this, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for (Player p : Bukkit.getOnlinePlayers())
+                {
+                    channelListener.refeshPlayer(p);
+                }
+            }
+        });
     }
 
     public void findNCP()
@@ -57,8 +74,9 @@ public class DaFlightManager extends JavaPlugin
 
     public void registerChannels()
     {
+        channelListener = new ChannelListener(ncp);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", new ChannelListener(ncp));
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", this.channelListener);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DaFlight");
     }
 
