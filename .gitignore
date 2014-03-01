@@ -7,3 +7,4 @@
 .idea/
 src/main/java/META-INF/
 target/
+*.iml

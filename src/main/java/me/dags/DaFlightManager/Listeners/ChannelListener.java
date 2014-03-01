@@ -14,7 +14,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 public class ChannelListener implements PluginMessageListener
 {
     private boolean ncp;
-    private int[] speeds = new int[]{2, 5, 7, 10, 15, 25, 50};
+    private int[] speeds = new int[]{2, 5, 7, 10, 13, 15, 25, 50};
 
     public ChannelListener(boolean b)
     {

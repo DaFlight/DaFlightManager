@@ -22,7 +22,7 @@ permissions:
     children:
       DaFlight.fullbright: true
       DaFlight.flymod: true
-      DaFlight.speed.15: true
+      DaFlight.speed.13: true
   DaFlight.*:
     default: op
     children:
@@ -36,23 +36,18 @@ permissions:
     description: Allow user to use DaFlight's flymod
     default: op
   DaFlight.speed.2:
-    description:
     default: op
   DaFlight.speed.5:
-    description:
     default: op
   DaFlight.speed.7:
-    description:
     default: op
   DaFlight.speed.10:
-    description:
+    default: op
+  DaFlight.speed.13:
     default: op
   DaFlight.speed.15:
-    description:
     default: op
   DaFlight.speed.25:
-    description:
     default: op
   DaFlight.speed.50:
-    description:
     default: op
