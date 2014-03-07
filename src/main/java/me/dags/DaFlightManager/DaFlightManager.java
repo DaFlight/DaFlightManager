@@ -1,14 +1,11 @@
 package me.dags.DaFlightManager;
 
 import me.dags.DaFlightManager.Listeners.ChannelListener;
+import me.dags.DaFlightManager.Listeners.DamageListener;
 import me.dags.DaFlightManager.Listeners.PlayerListener;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author dags_ <dags@dags.me>
@@ -18,9 +15,8 @@ public class DaFlightManager extends JavaPlugin
 {
 
     private static DaFlightManager daFlightManager;
-    private ChannelListener channelListener;
+    private Manager manager;
     private boolean ncp;
-    private Map<String, Boolean> daFlyers;
 
     public DaFlightManager()
     {
@@ -36,79 +32,63 @@ public class DaFlightManager extends JavaPlugin
     public void onEnable()
     {
         findNCP();
-        registerChannels();
-        daFlyers = new HashMap<String, Boolean>();
-        refreshPlayers();
+        loadConfig();
+        register();
+        this.manager = new Manager();
+        this.manager.refreshPlayers();
     }
 
     public void onDisable()
     {
-        daFlyers.clear();
+        this.manager.clear();
     }
 
-    public void refreshPlayers()
+    public void loadConfig()
     {
-        Bukkit.getScheduler().runTask(this, new Runnable()
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        String msg = "Did not find NoCheatPlus";
+        if (this.ncp)
         {
-            @Override
-            public void run()
+            this.ncp = getConfig().getBoolean("HookIntoNCP");
+            if (this.ncp)
             {
-                for (Player p : Bukkit.getOnlinePlayers())
-                {
-                    channelListener.refeshPlayer(p);
-                }
+                msg = "Hooking into NoCheatPlus!";
             }
-        });
+            else
+            {
+                msg = "Not hooking into NoCheatPlus!";
+            }
+        }
+        getLogger().info(msg);
     }
 
     public void findNCP()
     {
         Plugin p = Bukkit.getPluginManager().getPlugin("NoCheatPlus");
-        ncp = p != null;
+        this.ncp = p != null;
 
-        if (ncp)
+        if (this.ncp)
         {
             getLogger().info("Found NoCheatPlus!");
         }
     }
 
-    public void registerChannels()
+    public void register()
     {
-        channelListener = new ChannelListener(ncp);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", this.channelListener);
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", new ChannelListener(ncp));
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DaFlight");
-    }
 
-    public boolean cancelFallDamage(Player p)
-    {
-        if (daFlyers.containsKey(p.getName()))
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        if (getConfig().getBoolean("NoFallDamage"))
         {
-            if (daFlyers.get(p.getName()))
-            {
-                daFlyers.remove(p.getName());
-            }
-            return true;
+            Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
         }
-        return false;
     }
 
-    public void setDaFlyer(Player p, boolean b)
+    public static Manager getManager()
     {
-        daFlyers.put(p.getName(), b);
-    }
-
-    public void removeDaFlyer(Player p)
-    {
-        if (daFlyers.containsKey(p.getName()))
-        {
-            if (daFlyers.get(p.getName()))
-            {
-                daFlyers.put(p.getName(), false);
-                return;
-            }
-            daFlyers.remove(p.getName());
-        }
+        return inst().manager;
     }
 
 }
