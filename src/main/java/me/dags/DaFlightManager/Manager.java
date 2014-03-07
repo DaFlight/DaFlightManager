@@ -1,6 +1,5 @@
 package me.dags.DaFlightManager;
 
-import me.dags.DaFlightManager.Listeners.ChannelListener;
 import me.dags.DaFlightManager.Messenger.DaFlightMessenger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,7 +20,7 @@ public class Manager
     public Manager()
     {
         this.daFlyers = new HashMap<String, Boolean>();
-        this.daFlightMessenger = new DaFlightMessenger();
+        this.daFlightMessenger = new DaFlightMessenger(DaFlightManager.inst());
     }
 
     public void setDaFlyer(Player p, boolean b)

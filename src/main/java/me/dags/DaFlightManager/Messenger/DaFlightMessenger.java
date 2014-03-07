@@ -1,7 +1,8 @@
 package me.dags.DaFlightManager.Messenger;
 
-import me.dags.DaFlightManager.DaFlightManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 /**
  * @author dags_ <dags@dags.me>
@@ -11,12 +12,14 @@ public class DaFlightMessenger
 {
 
     private int[] speeds = new int[]{2, 3, 5, 7, 10, 13, 15, 25, 50};
+    private String plugin;
     private String flyNode;
     private String fbNode;
     private String speedNode;
 
-    public DaFlightMessenger()
+    public DaFlightMessenger(Plugin p)
     {
+        this.plugin = p.getName();
         this.fbNode = "DaFlight.fullbright";
         this.flyNode = "DaFlight.flymod";
         this.speedNode = "DaFlight.speed";
@@ -138,9 +141,14 @@ public class DaFlightMessenger
         }
     }
 
+    private Plugin getPlugin()
+    {
+        return Bukkit.getPluginManager().getPlugin(this.plugin);
+    }
+
     private void dispatch(Player p, byte[] b)
     {
-        p.sendPluginMessage(DaFlightManager.inst(), "DaFlight", b);
+        p.sendPluginMessage(this.getPlugin(), "DaFlight", b);
     }
 
 }
