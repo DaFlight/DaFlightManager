@@ -1,6 +1,6 @@
 package me.dags.DaFlightManager;
 
-import me.dags.DaFlightManager.Messenger.DaFlightMessenger;
+import me.dags.DaFlightManager.API.DaFlightMessenger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
