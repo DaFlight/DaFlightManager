@@ -8,3 +8,6 @@
 src/main/java/META-INF/
 target/
 *.iml
+*.properties
+*.bat
+*.txt
