@@ -1,6 +1,6 @@
 name: DaFlightManager
 main: me.dags.DaFlightManager.DaFlightManager
-version: 1.0.0
+version: 0.0.1
 author: dags_
 softdepend: [NoCheatPlus]
 
@@ -34,6 +34,9 @@ permissions:
     default: op
   DaFlight.flymod:
     description: Allow user to use DaFlight's flymod
+    default: op
+  DaFlight.softfall:
+    description: User doesn't take fall damage whilst flying
     default: op
   DaFlight.speed.2:
     default: op

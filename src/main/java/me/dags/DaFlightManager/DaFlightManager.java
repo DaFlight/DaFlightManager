@@ -1,8 +1,5 @@
 package me.dags.DaFlightManager;
 
-import me.dags.DaFlightManager.Listeners.DaFlightListener;
-import me.dags.DaFlightManager.Listeners.DamageListener;
-import me.dags.DaFlightManager.Listeners.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,61 +10,57 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class DaFlightManager extends JavaPlugin
 {
 
-    private Manager manager;
     private boolean ncp;
+    private static DaFlightManager daFlightManager;
+
+    public DaFlightManager()
+    {
+        daFlightManager = this;
+    }
 
     public static DaFlightManager inst()
     {
-        return (DaFlightManager) Bukkit.getPluginManager().getPlugin("DaFlightManager");
+        if(daFlightManager == null)
+        {
+            daFlightManager = new DaFlightManager();
+        }
+        return daFlightManager;
     }
 
     public void onEnable()
     {
         loadConfig();
         register();
-        this.manager = new Manager();
-        this.manager.refreshPlayers();
+        DaFlightMessenger.getMessenger().refreshAll();
     }
 
     public void onDisable()
     {
-        this.manager.clear();
     }
 
     public void loadConfig()
     {
         getConfig().options().copyDefaults(true);
         saveConfig();
-        String msg = "Did not find NoCheatPlus";
+
+        String msg;
+        this.ncp = getConfig().getBoolean("HookIntoNCP");
+
         if (this.ncp)
         {
-            this.ncp = getConfig().getBoolean("HookIntoNCP");
-            if (this.ncp)
-            {
-                msg = "Hooking into NoCheatPlus!";
-            }
-            else
-            {
-                msg = "Not hooking into NoCheatPlus!";
-            }
+            msg = "Hooking into NoCheatPlus!";
+        }
+        else
+        {
+            msg = "Not hooking into NoCheatPlus!";
         }
         getLogger().info(msg);
     }
 
     public void register()
     {
-        new DaFlightListener(this, ncp);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DaFlight");
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        if (getConfig().getBoolean("NoFallDamage"))
-        {
-            Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-        }
-    }
-
-    public static Manager getManager()
-    {
-        return inst().manager;
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", new DaFlightListener(this, ncp));
     }
 
 }

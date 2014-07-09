@@ -1,8 +1,7 @@
-package me.dags.DaFlightManager.API;
+package me.dags.DaFlightManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 /**
  * @author dags_ <dags@dags.me>
@@ -14,24 +13,48 @@ import org.bukkit.plugin.Plugin;
 public class DaFlightMessenger
 {
 
-    private int[] speeds = new int[]{2, 3, 5, 7, 10, 13, 15, 25, 50};
-    private String plugin;
+    private static DaFlightMessenger instance;
+    private int[] speeds;
     private String flyNode;
+    private String softFallNode;
     private String fbNode;
     private String speedNode;
 
+    public static DaFlightMessenger getMessenger()
+    {
+        if (instance == null)
+        {
+            return new DaFlightMessenger();
+        }
+        return instance;
+    }
+
     /**
      * Create an instance of the DaFlight Messenger
-     * @param plugin Plugin - instance of the host plugin
      */
-    public DaFlightMessenger(Plugin plugin)
+    private DaFlightMessenger()
     {
-        Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, "DaFlight");
-
-        this.plugin = plugin.getName();
+        instance = this;
+        this.speeds = new int[]{2, 3, 5, 7, 10, 13, 15, 25, 50};
         this.fbNode = "DaFlight.fullbright";
         this.flyNode = "DaFlight.flymod";
+        this.softFallNode = "DaFlight.softfall";
         this.speedNode = "DaFlight.speed";
+    }
+
+    public void refreshAll()
+    {
+        Bukkit.getScheduler().runTaskLater(DaFlightManager.inst(), new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for (Player p : Bukkit.getOnlinePlayers())
+                {
+                    refeshPlayer(p);
+                }
+            }
+        }, 10L);
     }
 
     /**
@@ -42,7 +65,14 @@ public class DaFlightMessenger
     {
         this.returnFBPerms(target);
         this.returnFlyPerms(target);
+        this.returnSoftFallPerms(target);
         this.returnMaxSpeed(target);
+        this.sendUpdateRequest(target);
+    }
+
+    public void sendUpdateRequest(Player target)
+    {
+        this.dispatch(target, new byte[]{4, 0});
     }
 
     /**
@@ -132,9 +162,7 @@ public class DaFlightMessenger
      */
     public void returnFBPerms(Player target)
     {
-        byte[] b = new byte[2];
-        b[0] = 1;
-        b[1] = 0;
+        byte[] b = new byte[]{1, 0};
 
         if (target.hasPermission(this.fbNode))
         {
@@ -149,11 +177,24 @@ public class DaFlightMessenger
      */
     public void returnFlyPerms(Player target)
     {
-        byte[] b = new byte[2];
-        b[0] = 2;
-        b[1] = 0;
+        byte[] b = new byte[]{2, 0};
 
         if (target.hasPermission(this.flyNode))
+        {
+            b[1] = 1;
+        }
+        this.dispatch(target, b);
+    }
+
+    /**
+     * Send a FlyMod enable/disable message based on the player's permissions
+     * @param target - Player - targeted player
+     */
+    public void returnSoftFallPerms(Player target)
+    {
+        byte[] b = new byte[]{3, 0};
+
+        if (target.hasPermission(this.softFallNode))
         {
             b[1] = 1;
         }
@@ -168,9 +209,7 @@ public class DaFlightMessenger
     {
         if (target.hasPermission(this.flyNode))
         {
-            byte[] b = new byte[2];
-            b[0] = 100;
-            b[1] = 50;
+            byte[] b = new byte[]{100, 50};
 
             int limit = 0;
 
@@ -193,14 +232,9 @@ public class DaFlightMessenger
         }
     }
 
-    private Plugin getPlugin()
-    {
-        return Bukkit.getPluginManager().getPlugin(this.plugin);
-    }
-
     private void dispatch(Player p, byte[] b)
     {
-        p.sendPluginMessage(this.getPlugin(), "DaFlight", b);
+        p.sendPluginMessage(DaFlightManager.inst(), "DaFlight", b);
     }
 
 }
