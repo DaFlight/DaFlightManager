@@ -1,5 +1,6 @@
-package me.dags.daflightmanager;
+package me.dags.daflightmanager.messaging;
 
+import me.dags.daflightmanager.DaFlightManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -51,7 +52,7 @@ public class DaFlightMessenger
             {
                 for (Player p : Bukkit.getOnlinePlayers())
                 {
-                    refeshPlayer(p);
+                    refreshPlayer(p);
                 }
             }
         }, 10L);
@@ -61,13 +62,20 @@ public class DaFlightMessenger
      * Resend DaFlight permissions based on the player's current permissions
      * @param target - Player - targeted player
      */
-    public void refeshPlayer(Player target)
+    public void refreshPlayer(final Player target)
     {
-        this.returnFBPerms(target);
-        this.returnFlyPerms(target);
-        this.returnSoftFallPerms(target);
-        this.returnMaxSpeed(target);
-        this.sendUpdateRequest(target);
+        Bukkit.getScheduler().runTaskLater(DaFlightManager.inst(), new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                returnFBPerms(target);
+                returnFlyPerms(target);
+                returnSoftFallPerms(target);
+                returnMaxSpeed(target);
+                sendUpdateRequest(target);
+            }
+        }, 10L);
     }
 
     public void sendUpdateRequest(Player target)
@@ -164,7 +172,7 @@ public class DaFlightMessenger
     {
         byte[] b = new byte[]{1, 0};
 
-        if (target.hasPermission(this.fbNode))
+        if (target.hasPermission(this.fbNode) || target.isOp())
         {
             b[1] = 1;
         }
@@ -179,7 +187,7 @@ public class DaFlightMessenger
     {
         byte[] b = new byte[]{2, 0};
 
-        if (target.hasPermission(this.flyNode))
+        if (target.hasPermission(this.flyNode) || target.isOp())
         {
             b[1] = 1;
         }
@@ -194,7 +202,7 @@ public class DaFlightMessenger
     {
         byte[] b = new byte[]{3, 0};
 
-        if (target.hasPermission(this.softFallNode))
+        if (target.hasPermission(this.softFallNode) || target.isOp())
         {
             b[1] = 1;
         }

@@ -1,5 +1,7 @@
 package me.dags.daflightmanager;
 
+import me.dags.daflightmanager.messaging.DaFlightListener;
+import me.dags.daflightmanager.messaging.DaFlightMessenger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

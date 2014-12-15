@@ -1,7 +1,8 @@
-package me.dags.daflightmanager;
+package me.dags.daflightmanager.messaging;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import me.dags.daflightmanager.DaFlightManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -30,7 +31,7 @@ public class DaFlightListener implements PluginMessageListener
             if (b.length == 1 && b[0] == 1)
             {
                 log("DaFlight query received from " + p.getName());
-                DaFlightMessenger.getMessenger().refeshPlayer(p);
+                DaFlightMessenger.getMessenger().refreshPlayer(p);
             }
             else if (b.length == 2 && b[0] == 2)
             {
