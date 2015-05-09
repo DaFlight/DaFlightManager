@@ -5,15 +5,20 @@ import me.dags.daflightmanager.messaging.DaFlightMessenger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author dags_ <dags@dags.me>
  */
 
 public class DaFlightManager extends JavaPlugin
 {
-
-    private boolean ncp;
     private static DaFlightManager daFlightManager;
+    public static DaFlightMessenger messenger;
+
+    private List<Integer> speeds = new ArrayList<>();
+    private boolean ncp;
 
     public DaFlightManager()
     {
@@ -22,7 +27,7 @@ public class DaFlightManager extends JavaPlugin
 
     public static DaFlightManager inst()
     {
-        if(daFlightManager == null)
+        if (daFlightManager == null)
         {
             daFlightManager = new DaFlightManager();
         }
@@ -32,37 +37,58 @@ public class DaFlightManager extends JavaPlugin
     public void onEnable()
     {
         loadConfig();
+        messenger = new DaFlightMessenger(speeds);
         register();
-        DaFlightMessenger.getMessenger().refreshAll();
-    }
-
-    public void onDisable()
-    {
+        messenger.refreshAll();
     }
 
     public void loadConfig()
     {
         getConfig().options().copyDefaults(true);
         saveConfig();
-
-        String msg;
-        this.ncp = getConfig().getBoolean("HookIntoNCP");
-
-        if (this.ncp)
+        ncp = getConfig().getBoolean("HookIntoNCP", true);
+        speeds = getConfig().getIntegerList("Permissions.speeds");
+        if (speeds == null || speeds.isEmpty())
         {
-            msg = "Hooking into NoCheatPlus!";
+            speeds = defaultSpeeds();
+            getConfig().set("Permissions.speeds", speeds);
+            saveConfig();
         }
-        else
-        {
-            msg = "Not hooking into NoCheatPlus!";
-        }
+        String msg = ncp ? "Hooking into NoCheatPlus!" : "Not hooking into NoCheatPlus!";
         getLogger().info(msg);
     }
 
     public void register()
     {
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DaFlight");
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DaFlight", new DaFlightListener(this, ncp));
+        Bukkit.getScheduler().runTask(this, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (ncp)
+                {
+                    ncp = Bukkit.getPluginManager().getPlugin("NoCheatPlus") != null;
+                    String msg = ncp ? "Found NoCheatPlus!" : "Did not find NoCheatPlus!";
+                    getLogger().info(msg);
+                }
+                Bukkit.getPluginManager().registerEvents(new NoClipListener(), inst());
+                Bukkit.getMessenger().registerOutgoingPluginChannel(inst(), "DaFlight");
+                Bukkit.getMessenger().registerIncomingPluginChannel(inst(), "DaFlight", new DaFlightListener(ncp));
+            }
+        });
     }
 
+    private List<Integer> defaultSpeeds()
+    {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(3);
+        list.add(5);
+        list.add(10);
+        list.add(15);
+        list.add(20);
+        list.add(30);
+        list.add(50);
+        return list;
+    }
 }

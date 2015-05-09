@@ -4,6 +4,8 @@ import me.dags.daflightmanager.DaFlightManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 /**
  * @author dags_ <dags@dags.me>
  */
@@ -13,34 +15,17 @@ import org.bukkit.entity.Player;
  */
 public class DaFlightMessenger
 {
-
-    private static DaFlightMessenger instance;
-    private int[] speeds;
-    private String flyNode;
-    private String softFallNode;
-    private String fbNode;
-    private String speedNode;
-
-    public static DaFlightMessenger getMessenger()
+    public static final String FLY_NODE = "DaFlight.flymod";
+    public static final String SOFT_FALL_NODE = "DaFlight.softfall";
+    public static final String FB_NODE = "DaFlight.fullbright";
+    public static final String SPEED_NODE = "DaFlight.speed";
+    public static final String NO_CLIP_NODE = "DaFlight.noclip";
+    
+    private final List<Integer> speeds;
+    
+    public DaFlightMessenger(List<Integer> configSpeeds)
     {
-        if (instance == null)
-        {
-            return new DaFlightMessenger();
-        }
-        return instance;
-    }
-
-    /**
-     * Create an instance of the DaFlight Messenger
-     */
-    private DaFlightMessenger()
-    {
-        instance = this;
-        this.speeds = new int[]{2, 3, 5, 7, 10, 13, 15, 25, 50};
-        this.fbNode = "DaFlight.fullbright";
-        this.flyNode = "DaFlight.flymod";
-        this.softFallNode = "DaFlight.softfall";
-        this.speedNode = "DaFlight.speed";
+        speeds = configSpeeds;
     }
 
     public void refreshAll()
@@ -57,11 +42,7 @@ public class DaFlightMessenger
             }
         }, 10L);
     }
-
-    /**
-     * Resend DaFlight permissions based on the player's current permissions
-     * @param target - Player - targeted player
-     */
+    
     public void refreshPlayer(final Player target)
     {
         Bukkit.getScheduler().runTaskLater(DaFlightManager.inst(), new Runnable()
@@ -69,6 +50,7 @@ public class DaFlightMessenger
             @Override
             public void run()
             {
+                returnNoClipPerms(target);
                 returnFBPerms(target);
                 returnFlyPerms(target);
                 returnSoftFallPerms(target);
@@ -80,150 +62,41 @@ public class DaFlightMessenger
 
     public void sendUpdateRequest(Player target)
     {
-        this.dispatch(target, new byte[]{4, 0});
+        dispatch(target, DFData.getBooleanData(DFData.REFRESH, false));
     }
 
-    /**
-     * Set a custom permission node to replace 'DaFLight.fullbright'
-     * @param s String - new permission node
-     */
-    public void setFbNode(String s)
+    public void returnNoClipPerms(Player target)
     {
-        this.fbNode = s;
+        byte[] data = DFData.getBooleanData(DFData.NOCLIP, target.hasPermission(NO_CLIP_NODE) || target.isOp());
+        dispatch(target, data);
     }
 
-    /**
-     * Set a custom permission node to replace 'DaFLight.flymod'
-     * @param s String - new permission node
-     */
-    public void setFlyNode(String s)
-    {
-        this.flyNode = s;
-    }
-
-    /**
-     * Set a custom permission node to replace 'DaFLight.speed'
-     * @param s String - new permission node
-     */
-    public void setSpeedNode(String s)
-    {
-        this.speedNode = s;
-    }
-
-    /**
-     * Manually send a FullBright enable/disable message to the target player
-     * @param target - Player - targeted player
-     * @param toggle boolean - true = enabled, false = disabled
-     */
-    public void setPlayerFB(Player target, boolean toggle)
-    {
-        byte[] b = new byte[2];
-        b[0] = 1;
-        b[1] = 0;
-
-        if (toggle)
-        {
-            b[1] = 1;
-        }
-        this.dispatch(target, b);
-    }
-
-    /**
-     * Manually send a FlyMod enable/disable message to the target player
-     * @param target - Player - targeted player
-     * @param toggle boolean - true = enabled, false = disabled
-     */
-    public void setPlayerFlight(Player target, boolean toggle)
-    {
-        byte[] b = new byte[2];
-        b[0] = 2;
-        b[1] = 0;
-
-        if (toggle)
-        {
-            b[1] = 1;
-        }
-        this.dispatch(target, b);
-    }
-
-    /**
-     * Manually send a Fly-Speed message to the target player
-     * @param target - Player - targeted player
-     * @param i int - speed value (should be greater than 0)
-     */
-    public void setPlayerSpeed(Player target, int i)
-    {
-        if (i <= 0)
-        {
-            return;
-        }
-        byte[] b = new byte[2];
-        b[0] = 100;
-        b[1] = (byte) i;
-
-        this.dispatch(target, b);
-    }
-
-    /**
-     * Send a FullBright enable/disable message based on the player's permissions
-     * @param target - Player - targeted player
-     */
     public void returnFBPerms(Player target)
     {
-        byte[] b = new byte[]{1, 0};
-
-        if (target.hasPermission(this.fbNode) || target.isOp())
-        {
-            b[1] = 1;
-        }
-        this.dispatch(target, b);
+        byte[] data = DFData.getBooleanData(DFData.FULL_BRIGHT, target.hasPermission(FB_NODE) || target.isOp());
+        dispatch(target, data);
     }
 
-    /**
-     * Send a FlyMod enable/disable message based on the player's permissions
-     * @param target - Player - targeted player
-     */
     public void returnFlyPerms(Player target)
     {
-        byte[] b = new byte[]{2, 0};
-
-        if (target.hasPermission(this.flyNode) || target.isOp())
-        {
-            b[1] = 1;
-        }
-        this.dispatch(target, b);
+        byte[] data = DFData.getBooleanData(DFData.FLY_MOD, target.hasPermission(FLY_NODE) || target.isOp());
+        dispatch(target, data);
     }
 
-    /**
-     * Send a FlyMod enable/disable message based on the player's permissions
-     * @param target - Player - targeted player
-     */
     public void returnSoftFallPerms(Player target)
     {
-        byte[] b = new byte[]{3, 0};
-
-        if (target.hasPermission(this.softFallNode) || target.isOp())
-        {
-            b[1] = 1;
-        }
-        this.dispatch(target, b);
+        byte[] data = DFData.getBooleanData(DFData.NO_FALL_DAMAGE, target.hasPermission(SOFT_FALL_NODE) || target.isOp());
+        dispatch(target, data);
     }
 
-    /**
-     * Send a Fly-Speed message based on the player's permissions
-     * @param target - Player - targeted player
-     */
     public void returnMaxSpeed(Player target)
     {
-        if (target.hasPermission(this.flyNode))
+        if (target.hasPermission(FLY_NODE))
         {
-            byte[] b = new byte[]{100, 50};
-
             int limit = 0;
-
-            for (int i : this.speeds)
+            for (int i : speeds)
             {
-                if (target.hasPermission(this.speedNode + "." + i))
+                if (target.hasPermission(SPEED_NODE + "." + i))
                 {
                     if (i > limit)
                     {
@@ -231,11 +104,10 @@ public class DaFlightMessenger
                     }
                 }
             }
-
             if (limit > 0)
             {
-                b[1] = (byte) limit;
-                this.dispatch(target, b);
+                byte[] data = DFData.getValueData(DFData.SPEED, (byte) limit);
+                dispatch(target, data);
             }
         }
     }
@@ -244,5 +116,4 @@ public class DaFlightMessenger
     {
         p.sendPluginMessage(DaFlightManager.inst(), "DaFlight", b);
     }
-
 }

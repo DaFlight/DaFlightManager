@@ -1,1 +1,10 @@
 HookIntoNCP: true
+Permissions:
+  speeds:
+    - 2
+    - 5
+    - 10
+    - 15
+    - 20
+    - 30
+    - 50
