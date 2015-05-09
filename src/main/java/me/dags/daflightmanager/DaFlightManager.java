@@ -27,10 +27,6 @@ public class DaFlightManager extends JavaPlugin
 
     public static DaFlightManager inst()
     {
-        if (daFlightManager == null)
-        {
-            daFlightManager = new DaFlightManager();
-        }
         return daFlightManager;
     }
 
