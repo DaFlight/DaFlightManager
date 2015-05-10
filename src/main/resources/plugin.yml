@@ -5,7 +5,24 @@ author: dags_
 softdepend: [NoCheatPlus]
 website: ${project.url}
 
+commands:
+  dfrefresh:
+    description: Refresh DaFlight perms command
+    usage: /dfrefresh
+    aliases: [dfr]
+    permission: DaFlight.refresh
+    permission-message: Ain't got perms fo dat!
+
 permissions:
+  DaFlight.refresh.self:
+    description: Allow user to refresh their daflight permissions
+    default: op
+  DaFlight.refresh.other:
+    description: Allow user to refresh another user's daflight permissions
+    default: op
+  DaFlight.refresh.all:
+    description: Allow user to refresh all user's daflight permissions
+    default: op
   DaFlight.fullbright:
     description: Allow user to use DaFlight's fullbright
     default: op

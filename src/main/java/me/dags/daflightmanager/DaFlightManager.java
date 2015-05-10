@@ -1,5 +1,7 @@
 package me.dags.daflightmanager;
 
+import me.dags.daflightmanager.commands.RefreshCommand;
+import me.dags.daflightmanager.listeners.NoClipListener;
 import me.dags.daflightmanager.messaging.DaFlightListener;
 import me.dags.daflightmanager.messaging.DaFlightMessenger;
 import org.bukkit.Bukkit;
@@ -67,6 +69,7 @@ public class DaFlightManager extends JavaPlugin
                     String msg = ncp ? "Found NoCheatPlus!" : "Did not find NoCheatPlus!";
                     getLogger().info(msg);
                 }
+                getCommand("dfrefresh").setExecutor(new RefreshCommand());
                 Bukkit.getPluginManager().registerEvents(new NoClipListener(), inst());
                 Bukkit.getMessenger().registerOutgoingPluginChannel(inst(), "DaFlight");
                 Bukkit.getMessenger().registerIncomingPluginChannel(inst(), "DaFlight", new DaFlightListener(ncp));

@@ -2,7 +2,7 @@ package me.dags.daflightmanager.messaging;
 
 import me.dags.daflightmanager.DaFlightManager;
 import me.dags.daflightmanager.NCPHelper;
-import me.dags.daflightmanager.NoClipListener;
+import me.dags.daflightmanager.listeners.NoClipListener;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 

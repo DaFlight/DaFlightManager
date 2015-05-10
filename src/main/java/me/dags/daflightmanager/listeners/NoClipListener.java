@@ -1,4 +1,4 @@
-package me.dags.daflightmanager;
+package me.dags.daflightmanager.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
