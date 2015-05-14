@@ -42,7 +42,7 @@
     <repositories>
         <repository>
             <id>dags-nxs</id>
-            <url>http://nxs.dags.me/nexus/content/repositories/DaRepo/</url>
+            <url>http://repo.dags.me/content/repositories/darepo/</url>
         </repository>
         <repository>
             <id>spigotmc</id>
