@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.dags</groupId>
     <artifactId>DaFlightManager</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>DaFlightManager</name>
     <url>https://github.com/dags-/DaFlightManager</url>
@@ -60,6 +60,11 @@
             <groupId>fr.neatmonster</groupId>
             <artifactId>NoCheatPlus</artifactId>
             <version>3.10.12</version>
+        </dependency>
+        <dependency>
+            <groupId>me.dags</groupId>
+            <artifactId>DaFlightManagerCommon</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
     

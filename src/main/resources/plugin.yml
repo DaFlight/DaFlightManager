@@ -1,6 +1,6 @@
-name: DaFlightManager
-main: me.dags.daflightmanager.DaFlightManager
-version: ${project.version}-r${buildNumber}
+name: DaFlightManagerBukkit
+main: me.dags.daflightmanager.DaFlightManagerBukkit
+version: ${project.version}
 author: dags_
 softdepend: [NoCheatPlus]
 website: ${project.url}

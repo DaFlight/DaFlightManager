@@ -1,7 +1,8 @@
 package me.dags.daflightmanager.commands;
 
 import com.google.common.base.Optional;
-import me.dags.daflightmanager.DaFlightManager;
+import me.dags.daflightmanager.BukkitClient;
+import me.dags.daflightmanagercommon.DaFlightManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,6 +18,13 @@ public class RefreshCommand implements CommandExecutor
     private final static String REFRESH_SELF = "daflight.refresh.self";
     private final static String REFRESH_OTHER = "daflight.refresh.other";
     private final static String REFRESH_ALL = "daflight.refresh.all";
+
+    private final DaFlightManager<Player> manager;
+
+    public RefreshCommand(DaFlightManager<Player> dfManager)
+    {
+        manager = dfManager;
+    }
 
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String c, String[] a)
@@ -62,7 +70,7 @@ public class RefreshCommand implements CommandExecutor
             {
                 Player p = (Player) cs;
                 p.sendMessage("Refreshing DaFlight perms...");
-                DaFlightManager.messenger.refreshPlayer(p);
+                manager.getMessenger().refreshConnection(new BukkitClient(p));
             }
         }
         else
@@ -76,7 +84,7 @@ public class RefreshCommand implements CommandExecutor
         if (hasPerm(cs, REFRESH_ALL))
         {
             cs.sendMessage("Refreshing DaFlight perms for all...");
-            DaFlightManager.messenger.refreshAll();
+            manager.getMessenger().refreshAll();
         }
     }
 
@@ -88,7 +96,7 @@ public class RefreshCommand implements CommandExecutor
             if (target.isPresent())
             {
                 cs.sendMessage("Refreshing DaFlight perms for user: " + target.get().getName());
-                DaFlightManager.messenger.refreshPlayer(target.get());
+                manager.getMessenger().refreshConnection(new BukkitClient(target.get()));
             }
             else
             {
