@@ -4,12 +4,12 @@ Server-side management of DaFlight users
 
 =======
 
+###About
+DaFlightManager gives server owners fine-grain control over DaFlight-flymod users. It allows for features to be disabled/enabled, and even maximum fly/sprint speeds set, all defined by standard permission nodes. It also provides compatibility with the NoCheatPlus movement checks for Players using the mod - all other flight/speed-hack mods can still be blocked.<br/>
+
 ###Download
 http://build.dags.me/job/DaFlightManager-Bukkit/
 https://github.com/DaFlight/DaFlightManager/releases/
-
-###About
-DaFlightManager gives server owners fine-grain control over DaFlight-flymod users. It allows for features to be disabled/enabled, and even maximum fly/sprint speeds set, all defined by standard permission nodes. It also provides compatibility with the NoCheatPlus movement checks for Players using the mod - all other flight/speed-hack mods can still be blocked.<br/>
 
 ========
 
