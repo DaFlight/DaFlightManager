@@ -1,6 +1,7 @@
 package me.dags.daflightmanager;
 
 import me.dags.daflightmanager.commands.RefreshCommand;
+import me.dags.daflightmanager.commands.ReloadCommand;
 import me.dags.daflightmanager.listener.BukkitMessageListener;
 import me.dags.daflightmanager.listener.BukkitNoClipListener;
 import me.dags.daflightmanager.utils.BukkitConfig;
@@ -37,6 +38,12 @@ public class DaFlightManagerBukkit extends JavaPlugin implements PluginBase<Play
         manager.initManager();
     }
 
+    public void reload()
+    {
+        reloadConfig();
+        bukkitConfig = new BukkitConfig(getConfig());
+    }
+
     @Override
     public void registerMessenger(DFMessenger<Player> dfMessenger)
     {
@@ -59,6 +66,7 @@ public class DaFlightManagerBukkit extends JavaPlugin implements PluginBase<Play
     public void registerCommands(DaFlightManager<Player> manager)
     {
         getCommand("dfrefresh").setExecutor(new RefreshCommand(manager));
+        getCommand("dfreload").setExecutor(new ReloadCommand(manager));
     }
 
     @Override

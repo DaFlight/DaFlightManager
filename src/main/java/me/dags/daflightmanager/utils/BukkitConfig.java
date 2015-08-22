@@ -18,6 +18,19 @@ public class BukkitConfig extends DFConfig
     public BukkitConfig(Configuration config1)
     {
         config = config1;
+        loadProtections();
+    }
+
+    private void loadProtections()
+    {
+        List<String> protections = config.getStringList("NoClipProtection");
+        if (protections != null)
+        {
+            for (String s : protections)
+            {
+                super.addProtection(s);
+            }
+        }
     }
 
     @Override
@@ -33,6 +46,7 @@ public class BukkitConfig extends DFConfig
         return this;
     }
 
+    @Override
     public List<Integer> getSpeeds()
     {
         List<Integer> speeds = config.getIntegerList("Permissions.speeds");

@@ -2,9 +2,11 @@ package me.dags.daflightmanager.listener;
 
 import me.dags.daflightmanagercommon.DaFlightManager;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -16,9 +18,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class BukkitNoClipListener implements Listener
 {
-    private final DaFlightManager manager;
+    private final DaFlightManager<Player> manager;
 
-    public BukkitNoClipListener(DaFlightManager dfManager)
+    public BukkitNoClipListener(DaFlightManager<Player> dfManager)
     {
         manager = dfManager;
     }
@@ -37,6 +39,15 @@ public class BukkitNoClipListener implements Listener
         if (!e.getTo().equals(to) && manager.isNoClipper(e.getPlayer().getUniqueId()))
         {
             e.getPlayer().teleport(e.getTo());
+        }
+    }
+
+    @EventHandler (priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onDamage(EntityDamageEvent e)
+    {
+        if (manager.checkProtection(e.getEntity().getUniqueId(), e.getCause().name()))
+        {
+            e.setCancelled(true);
         }
     }
 

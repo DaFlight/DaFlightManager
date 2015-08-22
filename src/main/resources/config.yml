@@ -8,3 +8,12 @@ Permissions:
     - 20
     - 30
     - 50
+NoClipProtection:
+  - CONTACT
+  - DROWNING
+  - FALLING_BLOCK
+  - FIRE
+  - FIRE_TICK
+  - LAVA
+  - SUFFOCATION
+  - VOID

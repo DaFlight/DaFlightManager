@@ -12,6 +12,11 @@ commands:
     aliases: [dfr]
     permission: DaFlight.refresh
     permission-message: Ain't got perms fo dat!
+  dfreload:
+      description: Reload the config
+      usage: /dfreload
+      permission: DaFlight.reload
+      permission-message: Ain't got perms fo dat!
 
 permissions:
   DaFlight.refresh.self:
