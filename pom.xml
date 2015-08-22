@@ -10,8 +10,8 @@
     <url>https://github.com/dags-/DaFlightManager</url>
     
     <scm>
-        <connection>scm:git:https://github.com/dags-/DaFlightManager.git</connection>
-        <url>https://github.com/dags-/DaFlightManager</url>
+        <connection>scm:git:https://github.com/DaFlight/DaFlightManager.git</connection>
+        <url>https://github.com/DaFlight/DaFlightManager</url>
     </scm>
 
     <properties>
