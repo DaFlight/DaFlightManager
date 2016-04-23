@@ -1,4 +1,4 @@
-package me.dags.daflightmanager;
+package me.dags.daflightmanager.sponge;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -20,18 +20,18 @@ public class Config
 
     Float getMaxFlySpeed(Player player)
     {
-        return max(flySpeeds, player);
+        return max(flySpeeds, player, "fly");
     }
 
     Float getMaxSprintSpeed(Player player)
     {
-        return max(sprintSpeeds, player);
+        return max(sprintSpeeds, player, "sprint");
     }
 
-    private Float max(Map<String, Float> speeds, Player player)
+    private Float max(Map<String, Float> speeds, Player player, String type)
     {
         return speeds.entrySet().stream()
-                .filter(e -> player.hasPermission("daflight.speed." + e.getKey()))
+                .filter(e -> player.hasPermission("daflight." + type + "." + e.getKey()))
                 .map(Map.Entry::getValue)
                 .max((i1, i2) -> i1 > i2 ? 1 : -1).orElse(0F);
     }

@@ -1,4 +1,4 @@
-package me.dags.daflightmanager;
+package me.dags.daflightmanager.sponge;
 
 import com.google.inject.Inject;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -24,14 +24,17 @@ import java.nio.file.Path;
  * @author dags <dags@dags.me>
  */
 @Plugin(name = "DaFlightManager", id = "me.dags.daflightmanager", version = "2.0")
-public class DaFlightManager implements RawDataListener
+public class DFMSponge implements RawDataListener
 {
     private final Logger logger = LoggerFactory.getLogger("DaFlightManager");
 
     @Inject
     @ConfigDir(sharedRoot = false)
     private Path configDir;
+
     private Config config;
+    private ChannelBinding.RawDataChannel flyChannel;
+    private ChannelBinding.RawDataChannel sprintChannel;
 
     @Listener
     public void init(GamePreInitializationEvent event)
@@ -39,11 +42,8 @@ public class DaFlightManager implements RawDataListener
         config = loadConfig();
 
         Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-CONNECT").addListener(this);
-        ChannelBinding.RawDataChannel flyChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-FLY");
-        ChannelBinding.RawDataChannel sprintChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-SPRINT");
-
-        flyChannel.addListener(new ChannelHandler(flyChannel, p -> config.getMaxFlySpeed(p)));
-        sprintChannel.addListener(new ChannelHandler(sprintChannel, p -> config.getMaxSprintSpeed(p)));
+        flyChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-FLY");
+        sprintChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-SPRINT");
     }
 
     @Override
@@ -53,6 +53,12 @@ public class DaFlightManager implements RawDataListener
         {
             Player player = ((PlayerConnection) connection).getPlayer();
             logger.info("DaFlight connect message received from user {}", player.getName());
+
+            Float fly = config.getMaxFlySpeed(player);
+            Float sprint = config.getMaxSprintSpeed(player);
+
+            flyChannel.sendTo(player, b -> b.writeFloat(fly));
+            sprintChannel.sendTo(player, b -> b.writeFloat(sprint));
         }
     }
 
