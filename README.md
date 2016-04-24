@@ -1,6 +1,7 @@
 DaFlightManager [![Build Status](https://travis-ci.org/DaFlight/DaFlightManager.svg?branch=master)](https://travis-ci.org/DaFlight/DaFlightManager) [![latest](https://img.shields.io/badge/releases-latest-blue.svg)](https://github.com/DaFlight/DaFlightManager/releases/latest "Grab the Latest Build") 
 ===============
-Server-side management of DaFlight users for SpongeAPI and Bukkit
+Server-side management of DaFlight users for SpongeAPI and Bukkit  
+**Requires Java 8 or above**
 
 ### Default Config
 ```yml
