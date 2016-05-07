@@ -23,7 +23,7 @@ import java.nio.file.Path;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(name = "DaFlightManager", id = "me.dags.daflightmanager", version = "2.0")
+@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.0")
 public class DFMSponge implements RawDataListener
 {
     private final Logger logger = LoggerFactory.getLogger("DaFlightManager");
