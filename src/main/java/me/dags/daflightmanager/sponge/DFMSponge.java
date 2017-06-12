@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.1")
+@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.2")
 public class DFMSponge implements RawDataListener {
 
     private static Config config = Config.defaultConfig();
