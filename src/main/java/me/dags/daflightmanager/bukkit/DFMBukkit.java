@@ -8,13 +8,14 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.nio.ByteBuffer;
 
-public class DFMBukkit extends JavaPlugin implements PluginMessageListener
-{
-    private Config config = Config.defaultConfig();
+public class DFMBukkit extends JavaPlugin implements PluginMessageListener {
+
+    private static DFMBukkit instance;
+    private static Config config = Config.defaultConfig();
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
+        instance = this;
         Bukkit.getMessenger().registerIncomingPluginChannel(this, "DAFLIGHT-CONNECT", this);
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DAFLIGHT-FLY");
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DAFLIGHT-SPRINT");
@@ -22,25 +23,15 @@ public class DFMBukkit extends JavaPlugin implements PluginMessageListener
     }
 
     @Override
-    public void onPluginMessageReceived(String s, Player player, byte[] bytes)
-    {
+    public void onPluginMessageReceived(String s, Player player, byte[] bytes) {
         getLogger().info(String.format("DaFlight connect message received from user %s", player.getName()));
-
-        Float fly = config.getMaxFlySpeed(player);
-        Float sprint = config.getMaxSprintSpeed(player);
-
-        byte[] flyData = ByteBuffer.allocate(4).putFloat(fly).array();
-        byte[] sprintData = ByteBuffer.allocate(4).putFloat(sprint).array();
-
-        player.sendPluginMessage(this, "DAFLIGHT-FLY", flyData);
-        player.sendPluginMessage(this, "DAFLIGHT-SPRINT", sprintData);
+        resetSpeeds(player);
     }
 
-    private Config loadConfig()
-    {
+    private Config loadConfig() {
         Configuration configuration = getConfig();
-        if (configuration.contains("flySpeeds") && configuration.contains("sprintSpeeds"))
-        {
+
+        if (configuration.contains("flySpeeds") && configuration.contains("sprintSpeeds")) {
             Config config = new Config();
             configuration.getConfigurationSection("flySpeeds").getValues(false).entrySet().forEach(e -> {
                 config.flySpeeds.put(e.getKey(), ((Double) e.getValue()).floatValue());
@@ -50,9 +41,27 @@ public class DFMBukkit extends JavaPlugin implements PluginMessageListener
             });
             return config;
         }
+
         configuration.set("flySpeeds", config.flySpeeds);
         configuration.set("sprintSpeeds", config.sprintSpeeds);
         saveConfig();
         return config;
+    }
+
+    public static void sendFlySpeed(Player player, float speed) {
+        byte[] data = ByteBuffer.allocate(4).putFloat(speed).array();
+        player.sendPluginMessage(instance, "DAFLIGHT-FLY", data);
+    }
+
+    public static void sendSprintSpeed(Player player, float speed) {
+        byte[] data = ByteBuffer.allocate(4).putFloat(speed).array();
+        player.sendPluginMessage(instance, "DAFLIGHT-SPRINT", data);
+    }
+
+    public static void resetSpeeds(Player player) {
+        float fly = config.getMaxFlySpeed(player);
+        float sprint = config.getMaxSprintSpeed(player);
+        sendFlySpeed(player, fly);
+        sendSprintSpeed(player, sprint);
     }
 }

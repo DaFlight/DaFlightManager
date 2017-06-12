@@ -2,7 +2,8 @@ package me.dags.daflightmanager.sponge;
 
 import com.google.inject.Inject;
 import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
@@ -12,71 +13,60 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.network.*;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.0")
-public class DFMSponge implements RawDataListener
-{
+@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.1")
+public class DFMSponge implements RawDataListener {
+
+    private static Config config = Config.defaultConfig();
+    private static ChannelBinding.RawDataChannel flyChannel;
+    private static ChannelBinding.RawDataChannel sprintChannel;
+
     private final Logger logger = LoggerFactory.getLogger("DaFlightManager");
+    private final ConfigurationLoader<CommentedConfigurationNode> loader;
 
     @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path configDir;
-
-    private Config config;
-    private ChannelBinding.RawDataChannel flyChannel;
-    private ChannelBinding.RawDataChannel sprintChannel;
+    public DFMSponge(@ConfigDir(sharedRoot = false) ConfigurationLoader<CommentedConfigurationNode> loader) {
+        this.loader = loader;
+    }
 
     @Listener
-    public void init(GamePreInitializationEvent event)
-    {
-        config = loadConfig();
-
+    public void init(GamePreInitializationEvent event) {
+        reload(null);
         Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-CONNECT").addListener(this);
         flyChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-FLY");
         sprintChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-SPRINT");
     }
 
+    @Listener
+    public void reload(GameReloadEvent event) {
+        config = loadConfig();
+        Sponge.getServer().getOnlinePlayers().forEach(DFMSponge::resetSpeeds);
+    }
+
     @Override
-    public void handlePayload(ChannelBuf data, RemoteConnection connection, Platform.Type side)
-    {
-        if (connection instanceof PlayerConnection)
-        {
+    public void handlePayload(ChannelBuf data, RemoteConnection connection, Platform.Type side) {
+        if (connection instanceof PlayerConnection) {
             Player player = ((PlayerConnection) connection).getPlayer();
             logger.info("DaFlight connect message received from user {}", player.getName());
-
-            Float fly = config.getMaxFlySpeed(player);
-            Float sprint = config.getMaxSprintSpeed(player);
-
-            flyChannel.sendTo(player, b -> b.writeFloat(fly));
-            sprintChannel.sendTo(player, b -> b.writeFloat(sprint));
+            resetSpeeds(player);
         }
     }
 
-    private Config loadConfig()
-    {
-        Path configPath = configDir.resolve("config.conf");
-        if (Files.exists(configPath))
-        {
-            try
-            {
-                HoconConfigurationLoader loader = HoconConfigurationLoader.builder().setPath(configPath).build();
-                ConfigurationNode node = loader.load();
-                return ObjectMapper.forClass(Config.class).bindToNew().populate(node);
-            }
-            catch (IOException | ObjectMappingException e)
-            {
-                e.printStackTrace();
-            }
+    private Config loadConfig() {
+        try {
+            ConfigurationNode node = loader.load();
+            return ObjectMapper.forClass(Config.class).bindToNew().populate(node);
+        } catch (IOException | ObjectMappingException e) {
+            e.printStackTrace();
         }
 
         Config config = Config.defaultConfig();
@@ -84,27 +74,28 @@ public class DFMSponge implements RawDataListener
         return config;
     }
 
-    private void saveConfig(Config config)
-    {
-        Path configPath = configDir.resolve("config.conf");
-        try
-        {
-            if (!Files.exists(configPath.getParent()))
-            {
-                Files.createDirectories(configPath.getParent());
-            }
-            if (!Files.exists(configPath))
-            {
-                Files.createFile(configPath);
-            }
-            HoconConfigurationLoader loader = HoconConfigurationLoader.builder().setPath(configPath).build();
+    private void saveConfig(Config config) {
+        try {
             ConfigurationNode node = loader.createEmptyNode();
             ObjectMapper.forObject(config).populate(node);
             loader.save(node);
-        }
-        catch (IOException | ObjectMappingException e)
-        {
+        } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void sendFlySpeed(Player player, float speed) {
+        flyChannel.sendTo(player, b -> b.writeFloat(speed));
+    }
+
+    public static void sendSprintSpeed(Player player, float speed) {
+        sprintChannel.sendTo(player, b -> b.writeFloat(speed));
+    }
+
+    public static void resetSpeeds(Player player) {
+        float fly = config.getMaxFlySpeed(player);
+        float sprint = config.getMaxSprintSpeed(player);
+        sendFlySpeed(player, fly);
+        sendSprintSpeed(player, sprint);
     }
 }

@@ -11,33 +11,29 @@ import java.util.Map;
  * @author dags <dags@dags.me>
  */
 @ConfigSerializable
-public class Config
-{
+public class Config {
+
     @Setting
     private Map<String, Float> flySpeeds = new HashMap<>();
     @Setting
     private Map<String, Float> sprintSpeeds = new HashMap<>();
 
-    Float getMaxFlySpeed(Player player)
-    {
+    float getMaxFlySpeed(Player player) {
         return max(flySpeeds, player, "fly");
     }
 
-    Float getMaxSprintSpeed(Player player)
-    {
+    float getMaxSprintSpeed(Player player) {
         return max(sprintSpeeds, player, "sprint");
     }
 
-    private Float max(Map<String, Float> speeds, Player player, String type)
-    {
+    private float max(Map<String, Float> speeds, Player player, String type) {
         return speeds.entrySet().stream()
                 .filter(e -> player.hasPermission("daflight." + type + "." + e.getKey()))
                 .map(Map.Entry::getValue)
                 .max((i1, i2) -> i1 > i2 ? 1 : -1).orElse(0F);
     }
 
-    static Config defaultConfig()
-    {
+    static Config defaultConfig() {
         Config config = new Config();
         config.flySpeeds.put("guest", 1F);
         config.flySpeeds.put("member", 5F);
