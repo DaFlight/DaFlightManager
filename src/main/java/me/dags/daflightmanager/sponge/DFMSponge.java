@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.network.*;
 import org.spongepowered.api.plugin.Plugin;
 
@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.2")
+@Plugin(name = "DaFlightManager", id = "daflightmanager", version = "2.2.1")
 public class DFMSponge implements RawDataListener {
 
     private static Config config = Config.defaultConfig();
@@ -34,13 +34,13 @@ public class DFMSponge implements RawDataListener {
     private final ConfigurationLoader<CommentedConfigurationNode> loader;
 
     @Inject
-    public DFMSponge(@ConfigDir(sharedRoot = false) ConfigurationLoader<CommentedConfigurationNode> loader) {
+    public DFMSponge(@DefaultConfig(sharedRoot = false) ConfigurationLoader<CommentedConfigurationNode> loader) {
         this.loader = loader;
     }
 
     @Listener
-    public void init(GamePreInitializationEvent event) {
-        reload(null);
+    public void init(GameInitializationEvent event) {
+        config = loadConfig();
         Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-CONNECT").addListener(this);
         flyChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-FLY");
         sprintChannel = Sponge.getChannelRegistrar().createRawChannel(this, "DAFLIGHT-SPRINT");
@@ -64,14 +64,17 @@ public class DFMSponge implements RawDataListener {
     private Config loadConfig() {
         try {
             ConfigurationNode node = loader.load();
-            return ObjectMapper.forClass(Config.class).bindToNew().populate(node);
+            Config config = ObjectMapper.forClass(Config.class).bindToNew().populate(node);
+            if (config.isEmpty()) {
+                config = Config.defaultConfig();
+                saveConfig(config);
+            }
+            return config;
         } catch (IOException | ObjectMappingException e) {
-            e.printStackTrace();
+            Config config = Config.defaultConfig();
+            saveConfig(config);
+            return config;
         }
-
-        Config config = Config.defaultConfig();
-        saveConfig(config);
-        return config;
     }
 
     private void saveConfig(Config config) {
@@ -84,18 +87,18 @@ public class DFMSponge implements RawDataListener {
         }
     }
 
+    public static void resetSpeeds(Player player) {
+        float fly = config.getMaxFlySpeed(player);
+        float sprint = config.getMaxSprintSpeed(player);
+        sendFlySpeed(player, fly);
+        sendSprintSpeed(player, sprint);
+    }
+
     public static void sendFlySpeed(Player player, float speed) {
         flyChannel.sendTo(player, b -> b.writeFloat(speed));
     }
 
     public static void sendSprintSpeed(Player player, float speed) {
         sprintChannel.sendTo(player, b -> b.writeFloat(speed));
-    }
-
-    public static void resetSpeeds(Player player) {
-        float fly = config.getMaxFlySpeed(player);
-        float sprint = config.getMaxSprintSpeed(player);
-        sendFlySpeed(player, fly);
-        sendSprintSpeed(player, sprint);
     }
 }

@@ -26,11 +26,16 @@ public class Config {
         return max(sprintSpeeds, player, "sprint");
     }
 
+    boolean isEmpty() {
+        return flySpeeds.isEmpty() && sprintSpeeds.isEmpty();
+    }
+
     private float max(Map<String, Float> speeds, Player player, String type) {
         return speeds.entrySet().stream()
                 .filter(e -> player.hasPermission("daflight." + type + "." + e.getKey()))
                 .map(Map.Entry::getValue)
-                .max((i1, i2) -> i1 > i2 ? 1 : -1).orElse(0F);
+                .max(Float::compare)
+                .orElse(0F);
     }
 
     static Config defaultConfig() {
