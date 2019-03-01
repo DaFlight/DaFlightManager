@@ -50,12 +50,12 @@ public class DFMBukkit extends JavaPlugin implements PluginMessageListener {
 
     public static void sendFlySpeed(Player player, float speed) {
         byte[] data = ByteBuffer.allocate(4).putFloat(speed).array();
-        player.sendPluginMessage(instance, "DAFLIGHT-FLY", data);
+        player.sendPluginMessage(instance, "daflight:fly", data);
     }
 
     public static void sendSprintSpeed(Player player, float speed) {
         byte[] data = ByteBuffer.allocate(4).putFloat(speed).array();
-        player.sendPluginMessage(instance, "DAFLIGHT-SPRINT", data);
+        player.sendPluginMessage(instance, "daflight:sprint", data);
     }
 
     public static void resetSpeeds(Player player) {
