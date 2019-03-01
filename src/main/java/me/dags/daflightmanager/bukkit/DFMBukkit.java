@@ -16,9 +16,9 @@ public class DFMBukkit extends JavaPlugin implements PluginMessageListener {
     @Override
     public void onEnable() {
         instance = this;
-        Bukkit.getMessenger().registerIncomingPluginChannel(this, "DAFLIGHT-CONNECT", this);
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DAFLIGHT-FLY");
-        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "DAFLIGHT-SPRINT");
+        Bukkit.getMessenger().registerIncomingPluginChannel(this, "daflight:connect", this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "daflight:fly");
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "daflight:sprint");
         config = loadConfig();
     }
 
